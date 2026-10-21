@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>《椎间盘突出分型》· 白板手绘逻辑图</title>
+<style>
+@font-face{font-family:'LXGW WenKai';src:local('LXGW WenKai'),local('LXGWWenKai-Regular');font-display:swap}
+:root{
+  --paper:#FBF6F0; --ink:#201914; --muted:#9C928A;
+  --accent:#E0432E; --accent-soft:rgba(224,67,46,.07);
+  --line:#6A6058; --card:#FFFDFA;
+  --font-hand:"LXGW WenKai","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-hand);-webkit-font-smoothing:antialiased;line-height:1.6}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(circle at 18% 12%,rgba(224,67,46,.04),transparent 42%),
+             radial-gradient(circle at 86% 82%,rgba(224,67,46,.03),transparent 46%)}
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:48px 22px 90px}
+.tag{display:inline-block;font-size:13px;color:var(--muted);border:1.5px dashed var(--line);border-radius:6px;padding:2px 10px;margin-bottom:14px}
+h1{font-size:34px;line-height:1.25;letter-spacing:.02em}
+h1 .pen{color:var(--accent)}
+.sub{color:var(--muted);margin-top:8px;font-size:14.5px}
+.toc{margin-top:22px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);padding:14px 18px;font-size:14.5px}
+.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dashed var(--muted)}
+.toc li{margin:4px 0 4px 18px}
+.section{margin-top:52px;scroll-margin-top:20px}
+h2{font-size:23px;display:flex;align-items:center;gap:10px}
+h2::before{content:"";width:12px;height:12px;background:var(--accent);border-radius:3px;transform:rotate(45deg);flex:none}
+h3{font-size:18px;margin:26px 0 10px;color:#7a2d20}
+p{margin:10px 0}
+ul{margin:8px 0 8px 22px}
+li{margin:5px 0}
+b,strong{color:#7a2d20}
+.note{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 14px;margin:14px 0;font-size:14.5px}
+.figure{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px;margin:18px 0;box-shadow:2px 3px 0 rgba(32,25,20,.08)}
+.figure img{width:100%;height:auto;display:block;border-radius:6px}
+.figure figcaption{font-size:13.5px;color:var(--muted);margin-top:8px;text-align:center}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;background:var(--card)}
+th,td{border:1.5px solid #cfc5ba;padding:7px 10px;text-align:center}
+th{background:rgba(224,67,46,.06)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}h1{font-size:27px}}
+.foot{margin-top:64px;color:var(--muted);font-size:13px;border-top:1.5px dashed var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="tag">专业医学 · 影像学笔记</div>
+<h1>《椎间盘突出分型》<span class="pen">·</span>结构化笔记</h1>
+<p class="sub">整理自 OneNote 笔记《椎间盘突出分型》（含 16 张示意图 / 影像图）</p>
+
+<div class="toc">
+<b>目录</b>
+<ol>
+  <li><a href="#s1">正常椎间盘结构</a></li>
+  <li><a href="#s2">椎间盘退变：Pfirrmann 分级</a></li>
+  <li><a href="#s3">按突出方向分型</a></li>
+  <li><a href="#s4">按形态分型：膨出 / 突出 / 挤出 / 游离</a></li>
+</ol>
+</div>
+
+<!-- ============ 1 正常结构 ============ -->
+<div class="section" id="s1">
+<h2>一、正常椎间盘结构</h2>
+<p>椎间盘由中央的<b>髓核</b>及外周的<b>纤维环</b>构成。正常腰椎间盘后缘不超过椎体骨性终板的后缘，且中部略有凹陷、呈<b>肾形</b>。</p>
+<figure class="figure">
+  <img src="img/png_16.webp" alt="正常椎间盘结构示意图" loading="lazy">
+  <figcaption>正常椎间盘结构：髓核、纤维环、软骨终板与椎体骨松质</figcaption>
+</figure>
+</div>
+
+<!-- ============ 2 退变 ============ -->
+<div class="section" id="s2">
+<h2>二、椎间盘退变：Pfirrmann 分级</h2>
+
+<p><b>椎间盘病变包括以下表现：</b></p>
+<ul>
+  <li>髓核<b>含水量减少</b></li>
+  <li>纤维环<b>黏液样变性</b></li>
+  <li>T2WI 椎间盘信号<b>不均匀减低</b></li>
+  <li>椎间盘变薄</li>
+  <li>钙化、真空现象</li>
+  <li>继发改变：终板炎</li>
+</ul>
+
+<p>Pfirrmann 分级依据 MRI（T2WI）上四项指标：髓核信号、髓核结构、髓核与纤维环分界、椎间盘高度，共分 5 级：</p>
+
+<table>
+<tr><th>分级</th><th>髓核信号</th><th>髓核结构</th><th>髓核与纤维环分界</th><th>椎间盘高度</th></tr>
+<tr><td><b>Ⅰ</b></td><td>高</td><td>均质，亮白</td><td>清</td><td>正常</td></tr>
+<tr><td><b>Ⅱ</b></td><td>高</td><td>非均质，有或无水平带</td><td>清</td><td>正常</td></tr>
+<tr><td><b>Ⅲ</b></td><td>中等</td><td>非均质，灰</td><td>不清</td><td>正常或轻度降低</td></tr>
+<tr><td><b>Ⅳ</b></td><td>中低</td><td>非均质，灰或黑</td><td>消失</td><td>正常或轻度降低</td></tr>
+<tr><td><b>Ⅴ</b></td><td>低</td><td>非均质，黑</td><td>消失</td><td>椎间盘间隙塌陷</td></tr>
+</table>
+
+<div class="grid2">
+<figure class="figure">
+  <img src="img/png_03.webp" alt="Pfirrmann 分级影像对照" loading="lazy">
+  <figcaption>左：正常腰椎 MRI 矢状位；右：Pfirrmann Ⅰ–Ⅴ 级髓核形态对照</figcaption>
+</figure>
+<figure class="figure">
+  <img src="img/png_04.webp" alt="椎间盘病变表现" loading="lazy">
+  <figcaption>椎间盘病变的 MRI 表现要点</figcaption>
+</figure>
+</div>
+</div>
+
+<!-- ============ 3 方向分型 ============ -->
+<div class="section" id="s3">
+<h2>三、按突出方向分型</h2>
+
+<table>
+<tr><th>分型</th><th>突出物位置</th></tr>
+<tr><td><b>中央型</b></td><td>椎管中部</td></tr>
+<tr><td><b>旁中央型</b></td><td>椎管内一侧，未超过椎间孔内口</td></tr>
+<tr><td><b>外侧型（椎间孔型）</b></td><td>椎管以外（椎间孔）</td></tr>
+<tr><td><b>极外侧型（椎间孔外型）</b></td><td>侧前方（椎间孔外口以外）</td></tr>
+<tr><td>前方突出</td><td>前方</td></tr>
+<tr><td>椎体内突出</td><td>突入椎体内，形成<b>许莫氏结节</b></td></tr>
+</table>
+
+<figure class="figure">
+  <img src="img/png_01.webp" alt="按突出方向分型" loading="lazy">
+  <figcaption>椎间盘突出分型（按突出方向）笔记原文</figcaption>
+</figure>
+<figure class="figure">
+  <img src="img/png_07.webp" alt="突出方向位置示意图" loading="lazy">
+  <figcaption>横断位示意：各方向突出位置（红点）</figcaption>
+</figure>
+
+<h3>中央型突出</h3>
+<ul>
+  <li>突出物位于<b>椎管中部</b></li>
+  <li>主要对<b>硬膜外脂肪间隙和硬膜囊</b>形成压迫</li>
+</ul>
+<figure class="figure">
+  <img src="img/png_15.webp" alt="中央型突出病例" loading="lazy">
+  <figcaption>男，47 岁，反复腰痛 2 年 —— 中央型突出（轴位 + 矢状位）</figcaption>
+</figure>
+
+<h3>旁中央型突出</h3>
+<ul>
+  <li><b>此型最常见</b></li>
+  <li>突出物位于椎管内一侧，未超过椎间孔内口</li>
+  <li>主要对硬膜外脂肪间隙、硬膜囊和<b>神经根（下一节段，如 L5）</b>形成压迫</li>
+</ul>
+<figure class="figure">
+  <img src="img/png_05.webp" alt="旁中央型突出病例" loading="lazy">
+  <figcaption>男，47 岁，反复腰痛 2 年 —— 旁中央型突出</figcaption>
+</figure>
+
+<h3>外侧型（椎间孔型）突出</h3>
+<ul>
+  <li>突出物位于<b>椎管以外（椎间孔）</b></li>
+  <li>主要引起<b>椎间孔狭窄</b>和一侧根神经受压</li>
+</ul>
+<figure class="figure">
+  <img src="img/png_11.webp" alt="椎间孔型突出病例" loading="lazy">
+  <figcaption>男，47 岁，右下肢后部放射性疼痛半年 —— 椎间孔型突出</figcaption>
+</figure>
+</div>
+
+<!-- ============ 4 形态分型 ============ -->
+<div class="section" id="s4">
+<h2>四、按形态分型（Fardon 标准）</h2>
+
+<div class="note">判断核心两条线：<b>周径占比</b>（突出范围占椎间盘周径的比例，25% / 90° 为界）与<b>基底与突出物宽窄关系</b>。</div>
+
+<h3>1. 椎间盘膨出（Disc bulge）</h3>
+<ul>
+  <li>膨出范围<b>&gt;25% 椎间盘周径</b></li>
+  <li>对称性膨出：纤维环对称性膨出椎间盘边界 <b>&lt;3mm</b></li>
+  <li>不对称性膨出：纤维环不对称性膨出椎间盘边缘 <b>&gt;25%</b></li>
+</ul>
+<figure class="figure">
+  <img src="img/png_09.webp" alt="Disc bulge" loading="lazy">
+  <figcaption>Disc bulge：对称性（circumferential）与不对称性（asymmetric）</figcaption>
+</figure>
+
+<h3>2. 椎间盘突出（Disc protrusion）</h3>
+<ul>
+  <li>突出物<b>&lt;25% 椎间盘周径（&lt;90°）</b></li>
+  <li>任何平面，突出物<b>最大测量值均低于</b>移位椎间盘来源的<b>基底部</b>（A&lt;B）</li>
+</ul>
+<figure class="figure">
+  <img src="img/png_10.webp" alt="Disc protrusion" loading="lazy">
+  <figcaption>Disc protrusion：基底宽于突出物</figcaption>
+</figure>
+<div class="grid2">
+<figure class="figure">
+  <img src="img/png_06.webp" alt="突出 &gt;90 度测量" loading="lazy">
+  <figcaption>突出物周径占比以 90° 为界（&gt;90° 归挤出）</figcaption>
+</figure>
+<figure class="figure">
+  <img src="img/png_08.webp" alt="A 小于 B 测量法" loading="lazy">
+  <figcaption>A&lt;B：突出物最大径小于基底部</figcaption>
+</figure>
+</div>
+
+<h3>3. 椎间盘挤出（Disc extrusion）</h3>
+<ul>
+  <li>移位椎间盘<b>最大测量值大于</b>其来源的<b>基底部</b>（基底窄于突出物）</li>
+</ul>
+<figure class="figure">
+  <img src="img/png_13.webp" alt="Disc extrusion" loading="lazy">
+  <figcaption>Disc extrusion：突出物宽于基底</figcaption>
+</figure>
+<figure class="figure">
+  <img src="img/png_12.webp" alt="挤出 &lt;90 度测量" loading="lazy">
+  <figcaption>挤出型测量示意</figcaption>
+</figure>
+
+<h3>4. 椎间盘游离（Disc sequestration）</h3>
+<ul>
+  <li>游离椎间盘为椎间盘脱出，<b>与源椎间盘无任何联系</b></li>
+</ul>
+<figure class="figure">
+  <img src="img/png_14.webp" alt="Disc sequestration" loading="lazy">
+  <figcaption>Disc sequestration：游离碎片与椎间盘无连接</figcaption>
+</figure>
+</div>
+
+<div class="foot">
+来源：OneNote 笔记《椎间盘突出分型》｜示意图部分出自 jxradiology（Skalski）系列，仅作个人学习笔记使用。
+</div>
+</div>
+</body>
+</html>

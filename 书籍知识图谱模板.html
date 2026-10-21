@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>专业医学知识图谱</title>
+<style>
+  *{box-sizing:border-box}
+  
+  html,body{margin:0;height:100%;overflow:hidden;
+    background: radial-gradient(circle at 50% 44%, #27374F 0%, #1A2238 48%, #0C1120 100%);
+    background-attachment: fixed;
+    color:#E8E6E2;
+    font-family:"霞鹜文楷","LXGW WenKai",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  body.light{
+    background: radial-gradient(circle at 50% 44%, #FFFCF5 0%, #F4EAD7 52%, #D6C5A6 100%);
+    background-attachment: fixed;
+    color:#201914;
+  }
+  #top{position:fixed;top:0;left:0;right:0;z-index:10;
+    background:rgba(10,14,26,0.5);backdrop-filter: blur(10px);-webkit-backdrop-filter: blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.08);padding:10px 16px;display:flex;flex-wrap:wrap;
+    align-items:center;gap:10px 18px}
+  body.light #top{background:rgba(255,253,250,0.7);border-bottom:1px solid rgba(0,0,0,0.06)}
+  #top h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.5px;color:#E8E6E2}
+  body.light #top h1{color:#201914}
+  #top .sub{font-size:12px;color:rgba(232,230,226,0.55)}
+  body.light #top .sub{color:rgba(32,25,20,0.55)}
+  #themeBtn{font-size:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:#E8E6E2;
+    border-radius:14px;padding:4px 12px;cursor:pointer;font-family:inherit;transition:all .2s}
+  #themeBtn:hover{background:rgba(255,255,255,0.12)}
+  body.light #themeBtn{background:rgba(255,255,255,0.6);border:1px solid rgba(0,0,0,0.10);color:#201914}
+  
+  #searchWrap{position:relative;display:flex;align-items:center;flex:0 0 auto;min-width:0}
+  #searchInput{font-size:13px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);
+    color:#E8E6E2;border-radius:16px;padding:6px 14px 6px 30px;width:280px;  
+    outline:none;transition:background .2s,border-color .2s;font-family:inherit}
+  #searchInput:focus{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.35)}  
+  body.light #searchInput{background:rgba(255,255,255,0.6);border:1px solid rgba(0,0,0,0.10);color:#201914}
+  #searchIcon{position:absolute;left:10px;font-size:11px;opacity:.6;pointer-events:none}
+  #searchDropdown{position:absolute;top:34px;left:0;width:280px;  
+    
+    background:rgba(10,14,26,0.92);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.12);
+    border-radius:10px;display:none;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,0.5);min-width:170px}
+  body.light #searchDropdown{background:rgba(255,253,250,0.96);border:1px solid rgba(0,0,0,0.08)}
+  
+  .searchItem{padding:7px 12px;cursor:pointer;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:6px;color:#E8E6E2;white-space:nowrap;overflow:hidden}
+  body.light .searchItem{color:#201914;border-bottom:1px solid rgba(0,0,0,0.05)}
+  .searchItem:hover{background:rgba(255,255,255,0.08)}
+  body.light .searchItem:hover{background:rgba(0,0,0,0.05)}
+  .searchItem.has-card:hover{background:rgba(255,255,255,0.08)}
+  body.light .searchItem.has-card:hover{background:rgba(0,0,0,0.05)}
+  .searchItem .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  
+  .searchItem .nameWrap{
+    flex:0 0 auto;
+    display:flex;align-items:baseline;
+  }
+  .searchItem .name{
+    flex:0 0 auto;
+    font-size:13px;font-weight:600;
+    white-space:nowrap;
+  }
+  .searchItem .metaRating{
+    flex:0 0 auto;
+    font-size:11px;font-weight:700;color:inherit;
+    margin-left:5px;
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  .searchItem .authorSlot{
+    flex:0 1 auto;min-width:0;
+    margin-left:auto;
+    position:relative;
+    height:18px;
+    text-align:right;
+    cursor:default;
+  }
+  .searchItem.has-card .authorSlot{cursor:pointer}
+  .searchItem .author{
+    font-size:10.5px;font-style:italic;opacity:.55;color:inherit;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    text-align:right;display:block;
+    pointer-events:none;
+    transition:transform .25s ease-out,opacity .25s ease-out;
+  }
+  body.light .searchItem .author{opacity:.6}
+  
+  .searchItem .metaArrow{
+    position:absolute;top:0;right:0;bottom:0;left:0;
+    display:flex;align-items:center;justify-content:flex-end;
+    padding:0 4px 0 6px;
+    color:inherit;text-decoration:none;cursor:pointer;
+    font-size:14px;font-weight:700;line-height:1;letter-spacing:1px;
+    border-radius:4px;
+    opacity:0;pointer-events:none;
+    transform:translateX(20px);
+    transition:transform .25s ease-out,opacity .25s ease-out;
+  }
+  .searchItem.has-card:hover .author{transform:translateX(-100%);opacity:0}
+  .searchItem.has-card:hover .metaArrow{transform:translateX(0);opacity:1;pointer-events:auto}
+  .searchEmpty{padding:12px;font-size:12px;opacity:.6;color:#E8E6E2}
+  body.light .searchEmpty{color:#201914}
+  
+  
+  @keyframes cardLaunchPulse{
+    0%,100%{ transform:translate(8px,-50%) translateX(0) }
+    50%   { transform:translate(8px,-50%) translateX(4px) }
+  }
+  .filters{display:flex;flex-wrap:wrap;gap:6px}
+  
+  #relFilters{position:fixed;top:14px;right:18px;z-index:11;display:flex;gap:4px;align-items:center;
+    padding:5px 10px;background:rgba(10,14,26,0.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.08);border-radius:16px}
+  body.light #relFilters{background:rgba(255,253,250,0.7);border-color:rgba(0,0,0,0.06)}
+  @media (max-width:768px){#relFilters{display:none}}
+  .filters label{font-size:12px;display:inline-flex;align-items:center;gap:5px;
+    background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:14px;
+    padding:3px 10px;cursor:pointer;color:#E8E6E2;transition:all .2s}
+  .filters label:hover{background:rgba(255,255,255,0.10)}
+  body.light .filters label{background:rgba(255,255,255,0.55);border:1px solid rgba(0,0,0,0.08);color:#201914}
+  .filters input{display:none}
+  .filters label .dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 6px currentColor}
+  .filters .cat-btn{user-select:none;cursor:pointer;transition:all .18s;position:relative}
+  .filters .cat-btn .cnt{font-size:10.5px;opacity:.55;font-variant-numeric:tabular-nums;margin-left:3px}
+  .filters .cat-btn.active .cnt{opacity:.95}
+  
+  .filters .cat-btn.active{background:rgba(255,255,255,0.22);border-color:rgba(255,255,255,0.7);font-weight:600}
+  .filters .cat-btn.active .dot{transform:scale(1.30);box-shadow:0 0 16px currentColor, 0 0 4px rgba(255,255,255,0.65)}
+  body.light .filters .cat-btn.active{background:rgba(32,25,20,0.16);border-color:rgba(32,25,20,0.55);font-weight:600}
+  body.light .filters .cat-btn.active .dot{transform:scale(1.30);box-shadow:0 0 14px currentColor}
+  
+  .node.hl circle{stroke-width:3.0;filter:drop-shadow(0 0 10px rgba(255,255,255,0.55));}
+  body.light .node.hl circle{stroke-width:3.0;filter:drop-shadow(0 0 10px rgba(32,25,20,0.45));}
+  
+  .filters .rel-btn{user-select:none;cursor:pointer;font-size:11px;background:transparent;border:none;border-radius:0;
+    padding:2px 7px 2px 8px;color:rgba(232,230,226,0.6);transition:color .15s}
+  .filters .rel-btn:hover{color:rgba(232,230,226,0.95)}
+  body.light .filters .rel-btn{color:rgba(32,25,20,0.55)}
+  body.light .filters .rel-btn:hover{color:#201914}
+  .filters .rel-btn .dot{width:8px;height:8px;box-shadow:none}
+  .filters .rel-btn.off{text-decoration:line-through;color:rgba(232,230,226,0.30)}
+  body.light .filters .rel-btn.off{color:rgba(32,25,20,0.30)}
+  .filters .rel-btn.off .dot{background:transparent!important;box-shadow:inset 0 0 0 1.5px currentColor}
+  
+  .filters .rel-prefix{font-size:11px;color:rgba(232,230,226,0.4);align-self:center;margin-left:6px;border-left:1px solid rgba(255,255,255,0.10);padding-left:10px}
+  body.light .filters .rel-prefix{color:rgba(32,25,20,0.4);border-left-color:rgba(0,0,0,0.08)}
+  #wrap{position:absolute;top:62px;left:0;right:0;bottom:0;min-height:80vh}
+  svg{width:100%;height:100%;display:block;cursor:grab;min-height:80vh}
+  svg:active{cursor:grabbing}
+  
+  .link.dim{stroke-opacity:.04}
+  
+  .node circle{cursor:pointer;transition:filter .25s}
+  .node.book circle{filter:drop-shadow(0 0 7px rgba(255,255,255,0.28))}
+  .node.concept circle{filter:drop-shadow(0 0 4px rgba(255,255,255,0.16))}
+  .node.referenced circle{stroke-dasharray:4 3;stroke:rgba(232,230,226,0.4);stroke-width:1.5px}
+  body.light .node.referenced circle{stroke:rgba(60,50,40,0.35)}
+  .node text{pointer-events:none;font-family:inherit}
+  .node.book text{font-size:14px;font-weight:700;fill:#E8E6E2}
+  body.light .node text{fill:#201914}
+  .node.concept text{font-size:11px;font-weight:500;fill:rgba(232,230,226,0.8);text-anchor:middle}
+  .node.dim{opacity:.12}
+  .node.hl circle{filter:drop-shadow(0 0 16px rgba(255,255,255,0.6)) brightness(1.1)}
+  #tip{position:fixed;max-width:360px;background:rgba(10,14,26,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px 13px;font-size:13px;line-height:1.5;
+    box-shadow:0 8px 24px rgba(0,0,0,0.5);display:none;z-index:20;pointer-events:none;color:#E8E6E2;
+    white-space:nowrap;word-break:keep-all;overflow:visible}
+  body.light #tip{background:rgba(255,253,250,0.95);border:1px solid rgba(0,0,0,0.08);color:#201914}
+  #hint{position:fixed;bottom:12px;left:16px;font-size:12px;color:rgba(232,230,226,0.4);z-index:10}
+  body.light #hint{color:rgba(32,25,20,0.4)}
+</style>
+</head>
+<body>
+<div id="top">
+  <div>
+    <h1>书籍知识图谱</h1>
+  </div>
+  <button id="themeBtn">切浅色</button>
+  <div id="searchWrap" autocomplete="off">
+    <span id="searchIcon">🔎</span>
+    <input id="searchInput" type="search" placeholder="搜索书名" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true"/>
+    <div id="searchDropdown"></div>
+  </div>
+  <div class="filters" id="domainLegend" style="gap:8px"></div>
+</div>
+<div class="filters" id="relFilters" style="gap:8px;align-items:center;display:none"></div>
+<div id="wrap"><svg id="svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet"></svg></div>
+<div id="tip"></div>
+<div id="hint">滚轮拉远看更多 · 拉近看细节 · 拖空白平移 · 双击复位</div>
+
+<script src="./assets/d3.v7.min.js"></script>
+<script type="module">
+
+const _EMBEDDED_GRAPH = {"nodes":[{"id":"b_4efe6bedfe","type":"book","label":"椎间盘突出分型","title_full":"椎间盘突出分型","author":"自整理笔记","category":"脊柱与脊髓","group":"脊柱与脊髓","status":"done","rating":null,"has_card":true,"card_path":"cards/zhui-jian-pan-tu-chu/椎间盘突出分型-知识卡片.html"},{"id":"c_d3c9378202","type":"concept","label":"MRI","books":["b_4efe6bedfe"],"use_count":1,"category":"脊柱与脊髓","group":"脊柱与脊髓","importance":2},{"id":"c_18685fc744","type":"concept","label":"Pfirrmann分级","books":["b_4efe6bedfe"],"use_count":1,"category":"脊柱与脊髓","group":"脊柱与脊髓","importance":2},{"id":"c_f1758a58c1","type":"concept","label":"椎间盘","books":["b_4efe6bedfe"],"use_count":1,"category":"脊柱与脊髓","group":"脊柱与脊髓","importance":2},{"id":"c_8c70129713","type":"concept","label":"纤维环","books":["b_4efe6bedfe"],"use_count":1,"category":"脊柱与脊髓","group":"脊柱与脊髓","importance":2},{"id":"c_36093757fe","type":"concept","label":"许莫氏结节","books":["b_4efe6bedfe"],"use_count":1,"category":"脊柱与脊髓","group":"脊柱与脊髓","importance":2},{"id":"c_d41ed07f03","type":"concept","label":"髓核","books":["b_4efe6bedfe"],"use_count":1,"category":"脊柱与脊髓","group":"脊柱与脊髓","importance":2}],"links":[{"source":"b_4efe6bedfe","target":"c_f1758a58c1","relation":"包含","concept":"椎间盘"},{"source":"b_4efe6bedfe","target":"c_d3c9378202","relation":"包含","concept":"MRI"},{"source":"b_4efe6bedfe","target":"c_18685fc744","relation":"包含","concept":"Pfirrmann分级"},{"source":"b_4efe6bedfe","target":"c_8c70129713","relation":"包含","concept":"纤维环"},{"source":"b_4efe6bedfe","target":"c_d41ed07f03","relation":"包含","concept":"髓核"},{"source":"b_4efe6bedfe","target":"c_36093757fe","relation":"包含","concept":"许莫氏结节"}],"meta":{"version":"1.0-lite","description":"专业医学知识图谱","node_types":["book","concept","domain","author","category"],"relation_types":["相似","相悖","互补","应用","引用","批判","包含"],"color_by_relation":{"相似":"#7BC47E","互补":"#5DBDBD","相悖":"#E8483E","包含":"#C9B18A","引用":"#A88BD8","应用":"#F5C84C","批判":"#E8483E"},"group_colors":{"脊柱与脊髓":"#4D96FF"},"category_colors":{"脊柱与脊髓":"#4D96FF"},"categories":["脊柱与脊髓"],"gen_time":"基于 书单数据源.md (1 本)","node_count":7,"link_count":6,"book_count":1,"concept_count":6},"CARD_MAP":{"b_4efe6bedfe":"cards/zhui-jian-pan-tu-chu/椎间盘突出分型-知识卡片.html"}};;;
+let GRAPH = _EMBEDDED_GRAPH;
+  
+
+const CARD_MAP = {
+"b_4efe6bedfe": "cards/zhui-jian-pan-tu-chu/椎间盘突出分型-知识卡片.html",
+};;
+const REL_COLOR = GRAPH.meta.color_by_relation || {};
+let dark = true;  
+let selectedCategory = null;  
+const CAT_COLOR = GRAPH.meta.category_colors || GRAPH.meta.group_colors || {};
+
+const DASH = new Set(["相悖","批判"]);
+const nodes = GRAPH.nodes.map(d=>Object.assign({},d));
+const links = GRAPH.links.map(d=>Object.assign({},d));
+const nodeById = new Map(nodes.map(n=>[n.id,n]));
+links.forEach(l=>{ l.s=nodeById.get(l.source); l.t=nodeById.get(l.target); if(!l.s||!l.t) console.warn('broken link', l); });
+
+
+const deg = new Map(nodes.map(n=>[n.id,0]));
+links.forEach(l=>{ const s=l.source,t=l.target; if(s!=null&&t!=null){ deg.set(s,(deg.get(s)||0)+1); deg.set(t,(deg.get(t)||0)+1); } });
+
+let cw = document.getElementById("wrap").clientWidth || window.innerWidth;
+let ch = document.getElementById("wrap").clientHeight || (window.innerHeight - 70);
+if(cw < 400) cw = window.innerWidth || 1200;
+if(ch < 300) ch = (window.innerHeight - 70) || 800;
+const W = ()=>cw;
+const H = ()=>ch;
+
+
+const radius = n => {
+  if(n.type === "book") return 13;
+  if(n.status === "referenced") return 3;
+  return 3 + (n.importance || 3);
+};  ;
+
+
+const catCenters = {};
+const cats = Array.from(new Set(nodes.filter(n=>n.category && n.type==="book").map(n=>n.category)));  
+const catCount = Math.max(cats.length, 1);
+cats.forEach((c,i)=>{
+  const ang = (i / catCount) * Math.PI * 2 - Math.PI/2;  
+  catCenters[c] = { x: Math.cos(ang) * 0.25, y: Math.sin(ang) * 0.22 };  
+});
+
+
+nodes.forEach(n=>{
+  
+  n.x = W()/2 + (Math.random()-0.5)*W()*0.42;
+  n.y = H()/2 + (Math.random()-0.5)*H()*0.65;  
+});
+
+const svg = d3.select("#svg").attr("width", W()).attr("height", H())
+  .attr("viewBox", `0 0 ${W()} ${H()}`)  
+  .attr("preserveAspectRatio", "xMidYMid meet");
+const viewport = svg.append("g").attr("class","viewport");
+
+
+
+const bookAnchor = (() => {
+  
+  function djb2(s) {
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  
+  let _slotMap = new Map();
+  function precompute(nodesArr, linksArr) {
+    _slotMap.clear();
+    
+    const bookConcepts = new Map();
+    for (const l of linksArr) {
+      const s = l.s, t = l.t;
+      if (!s || !t) continue;
+      if (s.type === "book" && t.type === "concept") {
+        if (!bookConcepts.has(s.id)) bookConcepts.set(s.id, []);
+        bookConcepts.get(s.id).push(t);
+      } else if (t.type === "book" && s.type === "concept") {
+        if (!bookConcepts.has(t.id)) bookConcepts.set(t.id, []);
+        bookConcepts.get(t.id).push(s);
+      }
+    }
+    
+    for (const [bid, cs] of bookConcepts) {
+      cs.sort((a, b) => a.id.localeCompare(b.id));
+      cs.forEach((c, i) => {
+        if (_slotMap.has(c.id)) return;  
+        const seed = djb2(c.id);
+        const rng = mulberry32(seed);
+        
+        const angle = rng() * Math.PI * 2;
+        
+        const labelLen = (c.label || "").length;
+        const dist = (38 + labelLen * 4) * (0.85 + rng() * 0.30);
+        _slotMap.set(c.id, { angle, dist, primaryBook: bid });
+      });
+    }
+    
+    for (const c of nodesArr) {
+      if (c.type === "concept" && !_slotMap.has(c.id)) {
+        const seed = djb2(c.id || (Math.random().toString()));
+        const rng = mulberry32(seed);
+        _slotMap.set(c.id, { angle: rng() * Math.PI * 2, dist: 60, primaryBook: null });
+      }
+    }
+  }
+  function force(alpha) {
+    
+    if (_slotMap.size === 0 && links.length > 0) precompute(nodes, links);
+    for (const c of nodes) {
+      if (c.type !== "concept") continue;
+      if (c.fx != null) continue;
+      const slot = _slotMap.get(c.id);
+      if (!slot) continue;
+      
+      const ownBooks = [];
+      for (const l of links) {
+        if (l.s === c && l.t && l.t.type === "book") ownBooks.push(l.t);
+        else if (l.t === c && l.s && l.s.type === "book") ownBooks.push(l.s);
+      }
+      if (ownBooks.length === 0) continue;
+      let nearest = null, minD = Infinity;
+      for (const b of ownBooks) {
+        if (!isFinite(b.x)) continue;
+        const d = Math.hypot(c.x - b.x, c.y - b.y);
+        if (d < minD) { minD = d; nearest = b; }
+      }
+      if (!nearest) continue;
+      
+      
+      const targetX = nearest.x + Math.cos(slot.angle) * slot.dist;
+      const targetY = nearest.y + Math.sin(slot.angle) * slot.dist;
+      
+      const pullX = (targetX - c.x) * 0.05;
+      const pullY = (targetY - c.y) * 0.05;
+      c.vx += pullX;
+      c.vy += pullY;
+    }
+  }
+  force.initialize = () => {};
+  return force;
+})();
+const sim = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d=>d.id)
+      .distance(l=> (l.s.type==="book"&&l.t.type==="book")?150 : (l.t.type==="book"?30:35))    
+      .strength(l=>{  if(l.relation==="强相似") return 0.7;  if(l.relation==="相似") return 0.5;  if(l.relation==="相关") return 0.15;  return 0.45;})  )  
+  .force("charge", d3.forceManyBody().strength(-260))    
+  .force("center", d3.forceCenter(W()/2, H()/2).strength(0.45))  
+  
+  .force("clusterX", d3.forceX(d=>{ if(d.type==="book"&&d.category&&catCenters[d.category]){ if(selectedCategory===d.category) return W()/2; return W()/2 + catCenters[d.category].x*Math.min(W(),H())*0.4; } return W()/2; }).strength(d=> selectedCategory===d.category ? 0.85 : 0.25))  
+  
+  .force("clusterY", d3.forceY(d=>{ if(d.type==="book"&&d.category&&catCenters[d.category]){ if(selectedCategory===d.category) return H()/2; return H()/2 + catCenters[d.category].y*Math.min(W(),H())*0.4; } return H()/2; }).strength(d=> selectedCategory===d.category ? 0.85 : 0.18))  
+  .force("collide", d3.forceCollide().radius(d=>radius(d)+12).strength(0.85))  
+  .force("bookAnchor", bookAnchor)  
+  .alpha(0.6)
+  .alphaDecay(0.05)  
+  
+
+
+
+
+for(const n of nodes){ if(!isFinite(n.x) || !isFinite(n.y)){ n.x = W()/2 + (Math.random()-0.5)*W()*0.5; n.y = H()/2 + (Math.random()-0.5)*H()*0.6; } }
+
+
+const zoom = d3.zoom().scaleExtent([0.1, 6])
+  .on("zoom", (e)=> viewport.attr("transform", e.transform));
+
+function fitContent(pad=60){
+  let xmin=Infinity,ymin=Infinity,xmax=-Infinity,ymax=-Infinity;
+  let cnt=0;
+  
+  for(const n of nodes){
+    if(n.type!=="book") continue;
+    if(!isFinite(n.x)||!isFinite(n.y)) continue;
+    const r = radius(n)+4;
+    if(n.x-r<xmin) xmin=n.x-r; if(n.x+r>xmax) xmax=n.x+r;
+    if(n.y-r<ymin) ymin=n.y-r; if(n.y+r>ymax) ymax=n.y+r;
+    cnt++;
+  }
+  if(cnt===0) return;
+  const bw=xmax-xmin, bh=ymax-ymin;
+  if(bw<=0||bh<=0) return;
+  let k = Math.min((W()-2*pad)/bw, (H()-2*pad)/bh);
+  
+  if(k < 0.85) k = 0.85;
+  if(k > 1.2) k = 1.2;
+  const cx=(xmin+xmax)/2, cy=(ymin+ymax)/2;
+  const t = d3.zoomIdentity.translate(W()/2 - cx*k, H()/2 - cy*k).scale(k);
+  svg.transition().duration(450).call(zoom.transform, t);
+}
+
+const initialT = d3.zoomIdentity;
+svg.call(zoom).call(zoom.transform, initialT);
+svg.on("dblclick.zoom", null);
+svg.on("dblclick", ()=> fitContent(60));  
+
+
+
+function relColor(rel){
+  const c = REL_COLOR[rel] || "#9C928A";
+  return c;
+}
+
+function linkWidth(d){
+  if(d.s.type==="book" && d.t.type==="book") return 2.0;
+  if(d.s.type==="concept" && d.t.type==="concept") return 1.6;
+  return 0.9;
+}
+function linkOpacity(d){  if(d.s.type==="book" && d.t.type==="book"){    if(d.relation==="强相似") return dark ? 0.18 : 0.30;    if(d.relation==="相似")   return dark ? 0.32 : 0.45;    if(d.relation==="相关")   return dark ? 0.22 : 0.32;    return dark ? 0.50 : 0.65;  }  if(d.s.type==="concept" && d.t.type==="concept") return dark ? 0.58 : 0.72;  return dark ? 0.48 : 0.60;}
+const link = viewport.append("g").attr("class","links")
+  .selectAll("line").data(links).join("line")
+  .attr("class","link")
+  .attr("stroke", d => relColor(d.relation))
+  .attr("stroke-opacity", linkOpacity)
+  .attr("stroke-width", linkWidth)
+  .attr("stroke-dasharray", d=> DASH.has(d.relation)?"6 4":null)
+  .style("pointer-events","stroke")  
+  .style("cursor","help")
+  .on("mouseover",(e,d)=>{
+    
+    const bookLabel = x => x.type==="book" ? x.label : (x.book || "—");
+    tip.innerHTML = `<b>${d.s.label}</b><span style="opacity:.55">（${bookLabel(d.s)}）</span> ↔ <b>${d.t.label}</b><span style="opacity:.55">（${bookLabel(d.t)}）</span>${d.concept?` · <span style="opacity:.7">${d.concept}</span>`:""}`;
+    tip.style.display = "block";
+    positionTip(e, tip);
+  })
+  .on("mousemove",(e)=>positionTip(e, tip))
+  .on("mouseout",()=>{ tip.style.display="none"; });
+
+
+const node = viewport.append("g").attr("class","nodes")
+  .selectAll("g").data(nodes).join("g")
+  .attr("class", d=> "node "+d.type+(d.status==="referenced"?" referenced":""))
+  .call(d3.drag()
+    .on("start",(e,d)=>{ if(e.sourceEvent) e.sourceEvent.stopPropagation(); if(!e.active)sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; })
+    .on("end",(e,d)=>{ if(!e.active)sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+
+node.append("circle")
+  .attr("r", radius)
+  
+  .attr("fill", d=>{
+    if(d.status==="referenced") return "#9C928A";
+    const cat = CAT_COLOR[d.category] ? d.category : (d.type==="concept" && d.book ? ((nodeById.get(d.book)||{}).category) : null);
+    return CAT_COLOR[cat] || "#888";
+  })
+  
+  .attr("stroke", d=> d.status==="referenced" ? null : (d.type==="book" ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.40)"))
+  .attr("stroke-width", d=> d.status==="referenced" ? null : (d.type==="book" ? 2.2 : 0.8))
+  .style("filter", d=> d.type==="book" ? "drop-shadow(0 0 7px rgba(255,255,255,0.32))" : null);
+
+node.filter(d=>d.type==="book").append("text")
+  .attr("text-anchor","middle").attr("dy", d=>radius(d)+17).text(d=>d.label);
+
+node.filter(d=>d.type==="concept").append("text")
+  .attr("text-anchor","middle").attr("dy", 4)
+  .style("font-size", "11px")
+  .style("font-weight", 500)
+  .style("fill", dark ? "rgba(232,230,226,0.8)" : "#201914")  
+  .text(d=>d.label);
+
+const adj = new Map(nodes.map(n=>[n.id,new Set([n.id])]));
+links.forEach(l=>{ if(l.s&&l.t){ adj.get(l.s.id).add(l.t.id); adj.get(l.t.id).add(l.s.id); } });
+
+const tip = document.getElementById("tip");
+
+function getCategoryHLSet(){
+  const hl = new Set();
+  if(!selectedCategory) return hl;
+  nodes.filter(n => n.type==="book" && n.category === selectedCategory).forEach(b => hl.add(b.id));
+  nodes.filter(n => n.type==="concept" && hl.has(n.book || n.books?.[0])).forEach(c => hl.add(c.id));
+  return hl;
+}
+
+let panT = null;
+let currentHoverId = null;
+function fitCategory(cat){
+  if(!cat){
+    if(panT){ svg.transition().duration(450).call(zoom.transform, initialT); panT = null; }
+    return;
+  }
+  
+  const set = nodes.filter(n => n.category === cat && isFinite(n.x) && isFinite(n.y));
+  if(!set.length) return;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  set.forEach(n=>{
+    const r = radius(n);
+    if(n.x-r < minX) minX = n.x-r;
+    if(n.x+r > maxX) maxX = n.x+r;
+    if(n.y-r < minY) minY = n.y-r;
+    if(n.y+r > maxY) maxY = n.y+r;
+  });
+  const cx = (minX+maxX)/2, cy = (minY+maxY)/2;
+  const boxW = maxX-minX, boxH = maxY-minY;
+  if(boxW<=0 || boxH<=0) return;
+  
+  const pad = 60;
+  const kFit = Math.min(W()/(boxW+pad), H()/(boxH+pad));
+  const k = Math.min(Math.max(kFit, 0.55), 1.4);
+  const tx = W()/2 - cx*k, ty = H()/2 - cy*k;
+  panT = d3.zoomIdentity.translate(tx,ty).scale(k);
+  svg.transition().duration(500).call(zoom.transform, panT);
+}
+function updateVisual(){
+  const catHL = getCategoryHLSet();
+  const hoverHL = currentHoverId ? adj.get(currentHoverId) : null;
+  const searchHLSet = searchHL ? new Set([searchHL]) : null;
+  
+  const isHL = o => {
+    if(hoverHL && hoverHL.has(o.id)) return true;
+    if(!hoverHL && searchHLSet && searchHLSet.has(o.id)) return true;
+    return catHL.has(o.id);
+  };
+  node.classed("hl", isHL);
+  node.classed("dim", o => {
+    if(hoverHL) return !hoverHL.has(o.id);
+    if(searchHLSet) return !searchHLSet.has(o.id);
+    if(selectedCategory) return !catHL.has(o.id);
+    return false;
+  });
+  link.classed("dim", o => {
+    if(hoverHL) return !(hoverHL.has(o.s.id) || hoverHL.has(o.t.id));
+    if(searchHLSet) return !(o.s.id === searchHL || o.t.id === searchHL);
+    if(selectedCategory) return !(catHL.has(o.s.id) || catHL.has(o.t.id));
+    return false;
+  });
+}
+
+function positionTip(e, t){
+  
+  let x = e.clientX + 14, y = e.clientY + 14;
+  t.style.left = x + "px";
+  t.style.top = y + "px";
+  const r = t.getBoundingClientRect();
+  const vw = window.innerWidth, vh = window.innerHeight;
+  if (r.right > vw - 8)  t.style.left = Math.max(8, e.clientX - r.width - 14) + "px";
+  if (r.bottom > vh - 8) t.style.top  = Math.max(8, e.clientY - r.height - 14) + "px";
+}
+node.on("mouseover",(e,d)=>{
+    currentHoverId = d.id;
+    updateVisual();
+    let html = `<b>${d.label}</b>`;
+    
+    if(d.type==="book" && d.author){
+      const au = (typeof cleanAuthorDisplay==="function") ? cleanAuthorDisplay(d.author) : d.author;
+      if(au) html += ` <span style="opacity:.6">${au}</span>`;
+    }
+    tip.innerHTML = html;
+    tip.style.display = "block";
+    positionTip(e, tip);
+  })
+  .on("mousemove",(e)=>positionTip(e, tip))
+  .on("mouseout",()=>{ tip.style.display="none"; currentHoverId = null; updateVisual(); });
+
+
+sim.on("tick",()=>{
+  link.attr("x1",d=>d.s.x).attr("y1",d=>d.s.y).attr("x2",d=>d.t.x).attr("y2",d=>d.t.y);
+  node.attr("transform",d=>"translate("+d.x+","+d.y+")");
+});
+
+
+function applyTheme(isDark){
+  dark = isDark;
+  document.body.classList.toggle("light", !isDark);
+  document.getElementById("themeBtn").textContent = isDark ? "切浅色" : "切深空";
+  link.attr("stroke-opacity", linkOpacity);  
+  
+  svg.selectAll(".node").filter(d=>d.type==="concept").select("text").style("fill", dark ? "rgba(232,230,226,0.8)" : "#201914");
+}
+applyTheme(true);
+document.getElementById("themeBtn").addEventListener("click", ()=> applyTheme(!dark));
+
+
+const rels = Array.from(new Set(links.map(l=>l.relation)));
+const fbox = d3.select("#relFilters");
+const hidden = new Set();
+
+
+
+const dbox = d3.select("#domainLegend");
+
+const catBookCount = {};
+nodes.filter(n=>n.type==="book" && n.category).forEach(n=>{ catBookCount[n.category] = (catBookCount[n.category]||0)+1; });
+cats.forEach(c=>{
+  const lab = dbox.append("label").attr("class","cat-btn").attr("data-cat",c).attr("title","点击突出该类别下的书与概念；再点一次或点空白处取消");
+  lab.append("span").attr("class","dot").style("background",CAT_COLOR[c]||"#888");
+  lab.append("span").attr("class","name").text(c);
+  lab.append("span").attr("class","cnt").text(catBookCount[c]||0);
+});
+
+let hadSelection = false;
+svg.on("click", function(ev){
+  hadSelection = !!(selectedCategory || searchHL);
+  if(ev.target === this){
+    if(selectedCategory){
+      selectedCategory = null;
+      dbox.selectAll(".cat-btn").classed("active", function(){ return (this.dataset.cat || "") === selectedCategory; });
+    }
+    if(searchHL){
+      searchHL = null;   
+      if(centerNode._timer){ clearTimeout(centerNode._timer); centerNode._timer = null; }
+    }
+    if(hadSelection){ updateVisual(); sim.alpha(0.2).restart();  }
+  }
+});
+
+dbox.selectAll(".cat-btn").on("click",function(ev){
+  ev.stopPropagation();
+  const cat = this.dataset.cat || null;
+  const newCat = (cat && selectedCategory === cat) ? null : cat;  
+  selectedCategory = newCat;
+  dbox.selectAll(".cat-btn").classed("active", function(){ return (this.dataset.cat || "") === selectedCategory; });
+  updateVisual();
+  if(selectedCategory) fitCategory(selectedCategory); sim.alpha(0.2).restart();  
+});
+
+node.on("click", function(ev){
+  const d = d3.select(this).datum();
+  ev.stopPropagation();
+  if(d && d.type==="book" && d.status!=="referenced"){
+    const f = CARD_MAP[d.id];
+    if(f){
+      // 同窗口跳转：内置浏览器面板/弹窗拦截环境下 window.open 会被吞掉
+      window.location.href = f;
+    }
+  }
+});
+
+
+window.addEventListener("resize",()=>{
+  cw = document.getElementById("wrap").clientWidth || window.innerWidth;
+  ch = document.getElementById("wrap").clientHeight || (window.innerHeight - 70);
+  if(cw < 400) cw = window.innerWidth || 1200;
+  if(ch < 300) ch = (window.innerHeight - 70) || 800;
+  svg.attr("width", W()).attr("height", H()).attr("viewBox", `0 0 ${W()} ${H()}`);
+  sim.force("center",d3.forceCenter(W()/2,H()/2));
+  sim.alpha(.3).restart();
+});
+
+
+const _demo = new URLSearchParams(location.search).get('demo');
+if(_demo){
+  setTimeout(()=>{
+    const btn = document.querySelector(`.cat-btn[data-cat="${_demo}"]`);
+    if(btn) btn.click();
+  }, 1200);
+}
+
+
+let searchHL = null;
+function nodeFillColor(n){
+  if(n.type === "concept") return "#" + ((n.id || "x").split("").reduce((a,c)=>a + c.charCodeAt(0), 0) % 0xFFFFFF).toString(16).padStart(6,"0").slice(0,6);
+  return CAT_COLOR[n.category] || "#888";
+}
+function centerNode(n){
+  if(!n || !isFinite(n.x) || !isFinite(n.y)) return;
+  searchHL = n.id;
+  
+  const k = (svg.__zoom && svg.__zoom.k) || 0.95;
+  const tx = W()/2 - n.x*k, ty = H()/2 - n.y*k;
+  const t = d3.zoomIdentity.translate(tx, ty).scale(k);
+  svg.transition().duration(550).call(zoom.transform, t);
+  updateVisual();
+  
+  if(centerNode._timer) clearTimeout(centerNode._timer);
+  centerNode._timer = setTimeout(()=>{
+    if(searchHL === n.id && !currentHoverId){
+      searchHL = null;
+      updateVisual();
+    }
+  }, 4000);
+}
+const searchInput = document.getElementById("searchInput");
+const searchDropdown = document.getElementById("searchDropdown");
+
+
+function cleanAuthorDisplay(a){
+  if(!a) return '';
+  a = String(a).trim();
+  
+  while(true){
+    const m = a.match(/^\[([^\]]+)\]\s*/);
+    if(!m) break;
+    a = a.slice(m[0].length);
+  }
+  if(a.includes('[')) a = a.split(' [')[0];
+  
+  for(const sep of [' / ',' /','/ ','／']){
+    if(a.includes(sep)){ a = a.split(sep)[0]; break; }
+  }
+  for(const sep of ['、','，',',','；',';']){
+    if(a.includes(sep)){ a = a.split(sep)[0]; break; }
+  }
+  for(const sep of [' 与 ',' 和 ',' & ',' &']){
+    if(a.includes(sep)){ a = a.split(sep)[0]; break; }
+  }
+  
+  if((a.includes('·')||a.includes('．'))){
+    for(const sep of ['与','和']){
+      if(a.includes(sep)){ a = a.split(sep)[0]; break; }
+    }
+  }
+  a = a.replace(/\s*译\s*$/,'').replace(/\s*著\s*$/,'').replace(/\s*编\s*$/,'').replace(/\s*主编\s*$/,'');
+  
+  a = a.replace(/[（(][^）)]*[）)]\s*$/,'');
+  
+  const chunks = a.split(/\s+/);
+  if(chunks.length >= 3 && !/[A-Za-z]/.test(chunks[0])) a = chunks[0];
+  a = a.replace(/\s*等\s*$/,'');
+  
+  if(!/[\w\u4e00-\u9fff]/.test(a)) return '';
+  return a.trim();
+}
+
+
+let _searchComposing = false;
+searchInput.addEventListener("compositionstart", ()=>{ _searchComposing = true; });
+searchInput.addEventListener("compositionend", ()=>{ _searchComposing = false; searchInput.dispatchEvent(new Event("input")); });
+searchInput.addEventListener("input", ()=>{
+  if(_searchComposing) return;  
+  const q = searchInput.value.trim().toLowerCase();
+  searchDropdown.innerHTML = "";
+  searchHL = null;
+  if(!q){
+    searchDropdown.style.display = "none";
+    updateVisual();
+    return;
+  }
+  
+  const bookNodes = nodes.filter(n => n.type === "book");
+  const matches = bookNodes.filter(n => {
+    const lab = (n.label || "").toLowerCase();
+    return lab.includes(q);
+  }).slice(0, 12);
+  if(!matches.length){
+    searchDropdown.innerHTML = '<div class="searchEmpty">无匹配内容</div>';
+  } else {
+    matches.forEach(n => {
+      const item = document.createElement("div");
+      const hasCard = n.has_card && n.card_path;
+      item.className = "searchItem" + (hasCard ? " has-card" : "");
+      const dotColor = CAT_COLOR[n.category] || "#888";
+      const au = cleanAuthorDisplay(n.author);
+      const authorHtml = au ? `<span class="author">${au}</span>` : "";
+
+      
+      const ratingHtml = typeof n.rating === "number"
+        ? `<span class="metaRating" style="color:${dotColor}">${n.rating.toFixed(1)}</span>`
+        : "";
+      const arrowHtml = hasCard
+        ? `<a class="metaArrow" style="color:${dotColor}" href="${n.card_path}" target="_blank" rel="noopener" title="打开《${n.label}》的知识卡片" aria-label="打开《${n.label}》的知识卡片">\u203A\u203A\u203A</a>`
+        : "";
+      const nameWrapHtml = `<span class="nameWrap"><span class="name">${n.label}</span>${ratingHtml}</span>`;
+      const authorSlotHtml = `<span class="authorSlot">${authorHtml}${arrowHtml}</span>`;
+
+      item.innerHTML = `<span class="dot" style="background:${dotColor}"></span>` + nameWrapHtml + authorSlotHtml;
+
+      
+      const arrow = item.querySelector(".metaArrow");
+      if(arrow){
+        arrow.addEventListener("click", (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          window.open(arrow.href, "_blank", "noopener");
+        });
+      }
+      
+      item.onclick = () => {
+        centerNode(n);
+        searchDropdown.style.display = "none";
+      };
+      searchDropdown.appendChild(item);
+    });
+  }
+  searchDropdown.style.display = "block";
+});
+searchInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter"){
+    const q = searchInput.value.trim().toLowerCase();
+    if(!q) return;
+    
+    const n = nodes.filter(x => x.type === "book").find(x => {
+      const lab = (x.label || "").toLowerCase();
+      return lab.includes(q);
+    });
+    if(n){ centerNode(n); searchDropdown.style.display = "none"; }
+  } else if(e.key === "Escape"){
+    searchHL = null;
+    searchInput.value = "";
+    searchDropdown.style.display = "none";
+    updateVisual();
+  }
+});
+searchInput.addEventListener("focus", () => {
+  if(searchInput.value.trim()) searchInput.dispatchEvent(new Event("input"));
+});
+document.addEventListener("click", (e) => {
+  if(!document.getElementById("searchWrap").contains(e.target)){
+    searchDropdown.style.display = "none";
+  }
+});
+
+
+const _sq = new URLSearchParams(location.search).get('search');
+if(_sq){
+  setTimeout(()=>{
+    const si = document.getElementById("searchInput");
+    if(si){ si.value = _sq; si.dispatchEvent(new Event("input")); }
+  }, 1500);
+}
+</script>
+</body>
+</html>
